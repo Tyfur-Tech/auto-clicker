@@ -47,6 +47,7 @@ class AutoClicker:
         self.root.title("Auto Clicker")
         self.root.geometry("360x420")
         self.root.resizable(False, False)
+        self._set_window_icon()
 
         self.mouse = MouseController()
         self.stop_event = threading.Event()
@@ -62,6 +63,20 @@ class AutoClicker:
 
         self.root.protocol("WM_DELETE_WINDOW", self._on_close)
         self._set_status("Ready")
+
+    # ---- Window icon --------------------------------------------------------
+
+    def _set_window_icon(self) -> None:
+        # The PNG is embedded as base64 in _icon.py so the --onefile build
+        # has the icon without needing PyInstaller --add-data. Falling back
+        # to the default Tk icon if the module is missing is fine -- the
+        # only consequence is a generic title-bar / taskbar icon.
+        try:
+            from _icon import ICON_PNG_B64
+            self._icon = tk.PhotoImage(data=ICON_PNG_B64)
+            self.root.iconphoto(True, self._icon)
+        except Exception:
+            pass
 
     # ---- UI construction ----------------------------------------------------
 

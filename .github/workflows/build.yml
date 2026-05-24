@@ -52,7 +52,15 @@ jobs:
           pip install pyinstaller
 
       - name: Build single-file binary
-        run: pyinstaller --onefile --windowed --name AutoClicker autoclicker.py
+        shell: bash
+        run: |
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            pyinstaller --onefile --windowed --name AutoClicker --icon icon.ico autoclicker.py
+          elif [ "${{ runner.os }}" = "macOS" ]; then
+            pyinstaller --onefile --windowed --name AutoClicker --icon icon.icns autoclicker.py
+          else
+            pyinstaller --onefile --windowed --name AutoClicker autoclicker.py
+          fi
 
       # macOS --windowed builds a .app bundle next to the unix binary. Zip the
       # .app so it survives upload + download (Finder unpacks the zip cleanly
