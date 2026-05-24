@@ -82,3 +82,7 @@ case the artifacts are attached to the workflow run instead of a release.
 - **Antivirus**: PyInstaller `--onefile` binaries are occasionally
   misflagged by Windows antivirus heuristics. The source is right here -- if
   you're unsure, build it yourself.
+
+## License
+
+[MIT](LICENSE) -- do whatever you want with it.
