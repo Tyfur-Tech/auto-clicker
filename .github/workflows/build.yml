@@ -19,13 +19,13 @@ jobs:
         include:
           - os: windows-latest
             asset_name: AutoClicker-Windows.exe
-            artifact_path: dist/AutoClicker.exe
+            artifact_path: dist/AutoClicker-Windows.exe
           - os: macos-latest
             asset_name: AutoClicker-macOS.zip
             artifact_path: dist/AutoClicker-macOS.zip
           - os: ubuntu-latest
             asset_name: AutoClicker-Linux
-            artifact_path: dist/AutoClicker
+            artifact_path: dist/AutoClicker-Linux
 
     steps:
       - name: Checkout
@@ -63,6 +63,17 @@ jobs:
           cd dist
           rm -f AutoClicker
           zip -r AutoClicker-macOS.zip AutoClicker.app
+
+      # Rename Win/Linux outputs so the release page shows obvious,
+      # OS-tagged filenames (matches the macOS zip naming).
+      - name: Rename Windows artifact
+        if: runner.os == 'Windows'
+        shell: bash
+        run: mv dist/AutoClicker.exe dist/AutoClicker-Windows.exe
+
+      - name: Rename Linux artifact
+        if: runner.os == 'Linux'
+        run: mv dist/AutoClicker dist/AutoClicker-Linux
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
