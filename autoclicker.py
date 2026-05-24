@@ -52,6 +52,10 @@ class AutoClicker:
         self.stop_event = threading.Event()
         self.worker: threading.Thread | None = None
         self.click_count = 0
+        # Tracks whether the hotkey is currently held down so we ignore the
+        # OS-level autorepeat keydown stream (otherwise holding F6 spams
+        # toggles).
+        self._hotkey_held = False
 
         self._build_ui()
         self._start_hotkey()
@@ -294,12 +298,19 @@ class AutoClicker:
 
     def _start_hotkey(self) -> None:
         def on_press(key):
-            if key == HOTKEY_KEY:
+            # Ignore autorepeat keydowns -- only act on the first press
+            # transition until the key is released.
+            if key == HOTKEY_KEY and not self._hotkey_held:
+                self._hotkey_held = True
                 # Marshal back to the Tk main thread -- Tk widgets are not
                 # thread-safe.
                 self.root.after(0, self._toggle)
 
-        self.hotkey_listener = keyboard.Listener(on_press=on_press)
+        def on_release(key):
+            if key == HOTKEY_KEY:
+                self._hotkey_held = False
+
+        self.hotkey_listener = keyboard.Listener(on_press=on_press, on_release=on_release)
         self.hotkey_listener.daemon = True
         self.hotkey_listener.start()
 
